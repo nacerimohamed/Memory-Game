@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>لعبة الذاكرة - Memory Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1a472a 0%, #0e2a1a 100%);
+            font-family: 'Segoe UI', 'Tahoma', 'Cairo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* حاوية اللعبة الرئيسية */
+        .game-container {
+            background: rgba(255, 248, 205, 0.9);
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+            padding: 20px 25px 35px;
+            text-align: center;
+            transition: all 0.2s ease;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #ffd966, #b87c2e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .sub {
+            color: #5a3e1b;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            border-bottom: 2px dashed #c2a15b;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* لوحة الإحصائيات */
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #2c2b26;
+            padding: 12px 20px;
+            border-radius: 100px;
+            margin-bottom: 30px;
+            color: #f9eec1;
+            font-weight: bold;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .moves, .matches, .timer {
+            background: #1e1d19;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            display: flex;
+            gap: 8px;
+            align-items: baseline;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .stats-panel span:first-child {
+            font-size: 0.85rem;
+            color: #e6c97e;
+        }
+
+        .stats-panel span:last-child {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ffd966;
+            line-height: 1;
+        }
+
+        /* شبكة البطاقات */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            justify-items: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        /* تصميم البطاقة */
+        .card {
+            background: transparent;
+            perspective: 600px;
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            cursor: default;
+            filter: drop-shadow(0 0 6px gold);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        /* الوجه الخلفي (الظهر) */
+        .card-back {
+            background: repeating-linear-gradient(45deg, #4f7a3f, #4f7a3f 12px, #3b5e2b 12px, #3b5e2b 24px);
+            border: 3px solid #f3d382;
+            transform: rotateY(0deg);
+            color: #ffecb3;
+            font-size: 2.8rem;
+        }
+
+        .card-back::after {
+            content: "?";
+            opacity: 0.9;
+            text-shadow: 2px 2px 0 #2b4a1a;
+        }
+
+        /* الوجه الأمامي (الصورة) */
+        .card-front {
+            background: #fffaf0;
+            transform: rotateY(180deg);
+            border: 3px solid #e7b42c;
+            box-shadow: inset 0 0 0 2px white;
+            color: #2c2b26;
+        }
+
+        /* رسالة النهاية */
+        .message-area {
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: #261f10c9;
+            backdrop-filter: blur(5px);
+            display: inline-block;
+            width: auto;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #f9eec1;
+        }
+
+        /* زر إعادة اللعبة */
+        .reset-btn {
+            background: #f4b942;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 40px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2c2b26;
+            box-shadow: 0 5px 0 #a25f1a;
+            font-family: inherit;
+        }
+
+        .reset-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #a25f1a;
+        }
+
+        /* استجابة للأجهزة الصغيرة */
+        @media (max-width: 550px) {
+            .board {
+                gap: 8px;
+            }
+            .stats-panel {
+                padding: 8px 12px;
+            }
+            .moves, .matches, .timer {
+                padding: 3px 12px;
+                font-size: 0.9rem;
+            }
+            .stats-panel span:last-child {
+                font-size: 1.2rem;
+            }
+            .card-front, .card-back {
+                font-size: 2rem;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .card-front, .card-back {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* تعطيل التفاعل أثناء انتظار التقليب */
+        .disable-click {
+            pointer-events: none;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            color: #836e3c;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🧠 لعبة الذاكرة 🃏</h1>
+    <div class="sub">✧ تقليب البطاقات وإيجاد الأزواج ✧</div>
+
+    <div class="stats-panel">
+        <div class="moves">🚀 الحركات: <span id="moveCount">0</span></div>
+        <div class="matches">🏆 الأزواج: <span id="matchCount">0</span></div>
+        <div class="timer">⏱️ الوقت: <span id="timerDisplay">00:00</span></div>
+    </div>
+
+    <div class="board" id="gameBoard"></div>
+
+    <div class="message-area" id="messageBox"></div>
+    <button class="reset-btn" id="resetGame">🔄 لعبة جديدة</button>
+    <footer>⭐ إقلب بطاقتين، تطابق؟ يبقون مكشوفين! ⭐</footer>
+</div>
+
+<script>
+    // ------------------- إعدادات الرموز (8 أزواج => 16 بطاقة) ------------------
+    const ICONS = [
+        "🐶", "🐱", "🐭", "🐹",   // حيوانات لطيفة
+        "🐰", "🦊", "🐻", "🐼"
+    ];
+    
+    // نسخ الأيقونات لتشكيل الأزواج ثم خلطها
+    let cardsData = [];        // يحفظ { icon: string, matched: bool, cardId: int }
+    let gameCards = [];        // عناصر DOM للبطاقات
+    let boardElement = document.getElementById('gameBoard');
+    
+    // متغيرات التحكم باللعبة
+    let moveCounter = 0;
+    let matchedPairs = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let gameActive = true;          // إذا انتهت اللعبة نمنع التقليب
+    let lockBoard = false;          // قفل أثناء معالجة التقليب أو عند مقارنة بطاقتين
+    let firstCard = null;           // العنصر الأول المقلوب
+    let secondCard = null;          // العنصر الثاني المقلوب
+    let firstCardId = null;
+    let secondCardId = null;
+    
+    // عناصر واجهة
+    const moveSpan = document.getElementById('moveCount');
+    const matchSpan = document.getElementById('matchCount');
+    const timerDisplaySpan = document.getElementById('timerDisplay');
+    const messageBox = document.getElementById('messageBox');
+    const resetBtn = document.getElementById('resetGame');
+    
+    // دوال مساعدة لتنسيق الوقت
+    function formatTime(sec) {
+        let minutes = Math.floor(sec / 60);
+        let seconds = sec % 60;
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    function updateTimerUI() {
+        timerDisplaySpan.textContent = formatTime(timerSeconds);
+    }
+    
+    // بدء المؤقت (فقط إذا لم يكن يعمل واللعبة لم تنتهِ بعد)
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (gameActive && matchedPairs < ICONS.length) {
+                timerSeconds++;
+                updateTimerUI();
+            } else if (matchedPairs === ICONS.length) {
+                // نوقف المؤقت عند النصر (لكن نظل نمنع الزيادة)
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }, 1000);
+    }
+    
+    // إيقاف المؤقت بشكل كامل
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+    
+    // تحديث عداد الحركات
+    function incrementMove() {
+        moveCounter++;
+        moveSpan.textContent = moveCounter;
+    }
+    
+    // تحديث عداد الأزواج
+    function updateMatches() {
+        matchSpan.textContent = matchedPairs;
+        if (matchedPairs === ICONS.length) {
+            // النصر!
+            gameActive = false;
+            stopTimer();
+            messageBox.textContent = `🎉🎊 تهانينا! لقد أكملت اللعبة في ${moveCounter} حركة و زمن ${formatTime(timerSeconds)} 🎊🎉`;
+            // إضافة تأثير إضافي: منع أي تقليب جديد
+            lockBoard = true;
+        } else {
+            messageBox.textContent = `✨ تم العثور على ${matchedPairs} من أصل ${ICONS.length} أزواج ✨`;
+        }
+    }
+    
+    // دالة لإعادة ضبط البطاقات المقلوبة مؤقتاً (لا تؤثر على المتطابقة)
+    function resetBoardState() {
+        // نحرر القفل و نمسح البطاقات المؤقتة
+        firstCard = null;
+        secondCard = null;
+        firstCardId = null;
+        secondCardId = null;
+        lockBoard = false;
+    }
+    
+    // فحص التطابق بين بطاقتين
+    function checkMatch(cardA, cardB, idA, idB) {
+        const iconA = cardsData[idA].icon;
+        const iconB = cardsData[idB].icon;
+        
+        if (iconA === iconB) {
+            // تطابق ناجح
+            cardsData[idA].matched = true;
+            cardsData[idB].matched = true;
+            
+            // إضافة كلاس matched للبطاقتين في DOM
+            const cardElementA = gameCards[idA];
+            const cardElementB = gameCards[idB];
+            cardElementA.classList.add('matched');
+            cardElementB.classList.add('matched');
+            // التأكد من بقاء الوجه مقلوباً (لا يمكن قلبه مجدداً)
+            cardElementA.classList.add('flipped');
+            cardElementB.classList.add('flipped');
+            
+            matchedPairs++;
+            updateMatches();
+            
+            // إعادة تعيين حالة البطاقات المؤقتة
+            resetBoardState();
+        } else {
+            // لا تطابق: بعد تأخير نقلب البطاقتين مرة أخرى للخلف
+            setTimeout(() => {
+                // التأكد أن البطاقات لم تصبح matched في الأثناء (لن تصبح لأننا نتحقق)
+                if (cardsData[idA].matched === false && cardsData[idB].matched === false) {
+                    // إزالة class flipped
+                    const cardElemA = gameCards[idA];
+                    const cardElemB = gameCards[idB];
+                    cardElemA.classList.remove('flipped');
+                    cardElemB.classList.remove('flipped');
+                }
+                // بعد انتهاء التقليب نفتح القفل للسماح بتقليب جديد
+                resetBoardState();
+                // إعادة تمكين النقر بعد انتهاء التأخير (lockBoard تم تحريره بواسطة resetBoardState)
+                // ولكن قد يكون هناك أكثر من تأثير، نتأكد
+                if (!gameActive) lockBoard = true; // إذا انتهت اللعبة نظل مقفل
+                else lockBoard = false;
+            }, 800);
+        }
+    }
+    
+    // معالجة النقر على البطاقة
+    function onCardClick(cardIndex) {
+        // شروط المنع:
+        if (lockBoard) return;
+        if (!gameActive) return;
+        if (cardsData[cardIndex].matched) return;   // بطاقة متطابقة نهائياً
+        
+        const currentCardElement = gameCards[cardIndex];
+        // إذا كانت البطاقة مقلوبة بالفعل ولم يتم التطابق (يعني أول/ثاني مكرر) نمنع
+        if (currentCardElement.classList.contains('flipped')) return;
+        
+        // إذا كان هناك بطاقتان مقلوبتان في الانتظار ( firstCard و secondCard ليسوا null ) هذا لا يجب أن يحدث بسبب lockBoard ولكن احتياطي
+        if (firstCard !== null && secondCard !== null) return;
+        
+        // بدء المؤقت عند أول حركة حقيقية (أول تقليب)
+        if (moveCounter === 0 && timerInterval === null && matchedPairs === 0) {
+            startTimer();
+        }
+        
+        // نقوم بتقليب البطاقة الحالية
+        currentCardElement.classList.add('flipped');
+        
+        // تحديث الحركات في كل مرة يتم فيها تقليب بطاقة (لكن كل زوج من التقليبات يحتسب حركة واحدة، نستخدم منطق أول/ثاني)
+        // نستخدم متغير لتتبع أول مرة نضيف فيها الحركة عند اكتمال زوج
+        if (firstCard === null) {
+            // أول بطاقة مقلوبة
+            firstCard = currentCardElement;
+            firstCardId = cardIndex;
+        } else if (secondCard === null && firstCardId !== cardIndex) {
+            // البطاقة الثانية مختلفة عن الأولى
+            secondCard = currentCardElement;
+            secondCardId = cardIndex;
+            // الآن تم قلب بطاقتين، نزيد عدد الحركات
+            incrementMove();
+            // نقفل اللوحة لمنع أي تقليب إضافي أثناء المقارنة
+            lockBoard = true;
+            // نقوم بالتحقق من التطابق
+            checkMatch(firstCard, secondCard, firstCardId, secondCardId);
+            // بعد استدعاء checkMatch، سيتم إعادة ضبط firstCard, secondCard داخل تلك الدالة أو بعد timeout
+            // لكن لضمان عدم وجود بقايا في المتغيرات محلياً، ننظف بعد استدعاء checkMatch
+            // مع العلم أن resetBoardState ستنظف داخل checkMatch لكن في حالة عدم التطابق بعد timeout.
+            // هنا نضع firstCard, secondCard كـ null بعد استدعاء checkMatch لأنها مسؤولة عن إعادة التعيين، ولكن قد تحتاج إلى حماية.
+            // للتأكد: بعد checkMatch سوف يتم استدعاء resetBoardState في النهاية. لكن لو حدث خطأ, سنقوم بتعيين مؤقت منفصل.
+            // دعنا نعتمد على أن firstCard,secondCard ستُفرغ داخل checkMatch. لكن في حالة التطابق الفوري يتم resetBoardState.
+            // في حالة عدم التطابق بعد 800 مللي ثانية سيتم resetBoardState. أضفنا أيضاً في نهاية checkMatch في فرع التطابق, وفي فرع عدم التطابق أيضاً.
+            // لكن هنا لو أبقينا firstCard و secondCard مع القيم سيسبب مشكلة. لذلك بعد استدعاء checkMatch, نضعهم في null بشكل فوري لتفادي إعادة النقر أثناء التأخير.
+            // لأنه عند إعادة النقر أثناء انتظار timeout قد يحدث عطب. لكن بفضل lockBoard لن يتم النقر. مع ذلك من الآمن إفراغهما.
+            // هذا آمن.
+            // نضبط firstCard, secondCard على null بشكل لحظي بعد التحقق, لأن checkMatch ستعيد ضبطهما بعد انتهاء المقارنة. 
+            // لكن في حالة التطابق تم resetBoardState, وفي حالة عدم التطابق سيتم بعد 800ms. لو وضعناهم null هنا لن يؤثر على التأخير.
+            // في الواقع resetBoardState تقوم بتعيين firstCard,secondCard = null, لذلك لا داعي للتداخل. لكن لضمان سلاسة أكثر:
+            // لا نريد إبقائهم بقيم قديمة بعد الاستدعاء. ولكن checkMatch ستقوم بإعادة تعيين بعد المقارنة (في الـ timeout أو فوراً). دعنا نضبطهم أيضاً هنا؟
+            // لكن لو تم ضبطهم null, وفي دالة checkMatch بعد 800ms يحاول استخدام firstCard (التي أصبحت null) لعمل إزالة كلاس flipped على null خطأ.
+            // لذلك من الضروري ألا نمسح firstCard,secondCard بأنفسنا بل نترك checkMatch تمسحهم بعد التأكد من اكتمال العملية.
+            // لذلك يجب أن نتركهم كما هم لاستخدامهم في checkMatch ضمن timeout.
+            // الحل الأمثل: checkMatch تستخدم المتغيرات العالمية firstCard,secondCard, وتقوم بتنظيفها بعد الاستخدام.
+            // سنعدل checkMatch لتنظيفها مباشرة قبل انتهاءها أو في timeout.
+            // ولكن لدينا بالفعل resetBoardState يفعل ذلك. لكن في حالة عدم التطابق سيتم التنظيف بعد الـ timeout.
+            // ممتاز.
+        } else {
+            // إذا حاول يقلب نفس البطاقة مرة أخرى أو أي حالة شاذة، نمنع.
+            return;
+        }
+    }
+    
+    // بناء الشبكة وخلط الأيقونات
+    function initGame() {
+        // إيقاف المؤقت القديم إن وجد
+        stopTimer();
+        // إعادة ضبط المتغيرات
+        moveCounter = 0;
+        matchedPairs = 0;
+        timerSeconds = 0;
+        gameActive = true;
+        lockBoard = false;
+        firstCard = null;
+        secondCard = null;
+        firstCardId = null;
+        secondCardId = null;
+        
+        moveSpan.textContent = "0";
+        matchSpan.textContent = "0";
+        updateTimerUI();
+        messageBox.textContent = "✨ اقلب بطاقتين وابحث عن الزوج! ✨";
+        
+        // تحضير الأزواج المزدوجة
+        let deck = [...ICONS, ...ICONS];
+        // خلط عشوائي (خوارزمية Fisher-Yates)
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+        
+        // بناء مصفوفة cardsData
+        cardsData = deck.map((icon, idx) => ({
+            icon: icon,
+            matched: false,
+            cardId: idx
+        }));
+        
+        // إعادة إنشاء لوحة اللعب
+        boardElement.innerHTML = "";
+        gameCards = [];
+        
+        deck.forEach((icon, idx) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            // إضافة حدث النقر
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                onCardClick(idx);
+            });
+            
+            const inner = document.createElement('div');
+            inner.className = 'card-inner';
+            
+            const front = document.createElement('div');
+            front.className = 'card-front';
+            front.textContent = icon;
+            
+            const back = document.createElement('div');
+            back.className = 'card-back';
+            
+            inner.appendChild(front);
+            inner.appendChild(back);
+            card.appendChild(inner);
+            
+            boardElement.appendChild(card);
+            gameCards.push(card);
+        });
+    }
+    
+    // إعادة ضبط كاملة (زر جديد)
+    function resetAndRestart() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        initGame();
+        // التأكد من أن اللعبة نشطة والمؤقت لم يبدأ بعد الحركات الأولى
+        gameActive = true;
+        lockBoard = false;
+        // مسح الرسائل الإضافية
+        messageBox.textContent = "✨ لعبة جديدة! ابدأ بتقليب البطاقات ✨";
+    }
+    
+    // ربط زر الإعادة
+    resetBtn.addEventListener('click', () => {
+        resetAndRestart();
+    });
+    
+    // بدء اللعبة أول مرة
+    initGame();
+</script>
+</body>
+</html>
