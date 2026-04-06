@@ -44,19 +44,11 @@
 
 ### Interface principale
 <p align="center">
-  <img src="https://via.placeholder.com/700x500/2c5f2d/ffffff?text=Game+Interface" alt="Game Interface" width="700">
+  <img src="gamePuc.PNG" alt="Game Interface" width="700">
   <br>
   <em>Interface principale du jeu avec les cartes retournées</em>
 </p>
 
-
-
-### Message de victoire
-<p align="center">
-  <img src="https://via.placeholder.com/700x300/2c5f2d/ffffff?text=Victory+Screen" alt="Victory Screen" width="700">
-  <br>
-  <em>Message de félicitations avec statistiques</em>
-</p>
 
 ### Version mobile (responsive)
 <div align="center">
@@ -74,29 +66,6 @@
 
 ---
 
-## 🎮 Gameplay en images
-
-<div align="center">
-  <table>
-    <tr>
-      <th>Étape 1</th>
-      <th>Étape 2</th>
-      <th>Étape 3</th>
-    </tr>
-    <tr>
-      <td><img src="https://via.placeholder.com/200x150/2c5f2d/ffffff?text=Step+1" alt="Step 1"></td>
-      <td><img src="https://via.placeholder.com/200x150/2c5f2d/ffffff?text=Step+2" alt="Step 2"></td>
-      <td><img src="https://via.placeholder.com/200x150/2c5f2d/ffffff?text=Step+3" alt="Step 3"></td>
-    </tr>
-    <tr>
-      <td align="center">Cliquez sur une carte</td>
-      <td align="center">Cliquez sur la seconde</td>
-      <td align="center">Paire trouvée ! ✅</td>
-    </tr>
-  </table>
-</div>
-
----
 
 ## 🚀 Installation
 
