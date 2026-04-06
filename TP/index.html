@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>لعبة الذاكرة - Memory Game</title>
+    <title>Memory Game - Jeu de Mémoire</title>
     <style>
         * {
             margin: 0;
@@ -34,15 +34,48 @@
             width: 100%;
         }
 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
         h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             background: linear-gradient(135deg, #ffd966, #b87c2e);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
             text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-            margin-bottom: 10px;
             letter-spacing: 2px;
+        }
+
+        .lang-switch {
+            background: #2c2b26;
+            border-radius: 50px;
+            padding: 5px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #f9eec1;
+        }
+
+        .lang-btn.active {
+            background: #f4b942;
+            color: #2c2b26;
         }
 
         .sub {
@@ -67,13 +100,15 @@
             color: #f9eec1;
             font-weight: bold;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.2);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .moves, .matches, .timer {
             background: #1e1d19;
             padding: 5px 16px;
             border-radius: 40px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: flex;
             gap: 8px;
             align-items: baseline;
@@ -81,12 +116,12 @@
         }
 
         .stats-panel span:first-child {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #e6c97e;
         }
 
         .stats-panel span:last-child {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #ffd966;
             line-height: 1;
@@ -176,7 +211,7 @@
         /* رسالة النهاية */
         .message-area {
             margin-top: 15px;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
             background: #261f10c9;
             backdrop-filter: blur(5px);
@@ -227,7 +262,11 @@
                 font-size: 2rem;
             }
             h1 {
-                font-size: 1.6rem;
+                font-size: 1.4rem;
+            }
+            .lang-btn {
+                padding: 4px 12px;
+                font-size: 0.8rem;
             }
         }
 
@@ -252,54 +291,118 @@
 <body>
 
 <div class="game-container">
-    <h1>🧠 لعبة الذاكرة 🃏</h1>
-    <div class="sub">✧ تقليب البطاقات وإيجاد الأزواج ✧</div>
+    <div class="header">
+        <h1 id="gameTitle">🧠 Jeu de Mémoire 🃏</h1>
+        <div class="lang-switch">
+            <button class="lang-btn" data-lang="fr">🇫🇷 FR</button>
+            <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+        </div>
+    </div>
+    <div class="sub" id="subText">✧ Retournez les cartes et trouvez les paires ✧</div>
 
     <div class="stats-panel">
-        <div class="moves">🚀 الحركات: <span id="moveCount">0</span></div>
-        <div class="matches">🏆 الأزواج: <span id="matchCount">0</span></div>
-        <div class="timer">⏱️ الوقت: <span id="timerDisplay">00:00</span></div>
+        <div class="moves">🚀 <span id="moveLabel">Mouvements:</span> <span id="moveCount">0</span></div>
+        <div class="matches">🏆 <span id="matchLabel">Paires:</span> <span id="matchCount">0</span></div>
+        <div class="timer">⏱️ <span id="timerLabel">Temps:</span> <span id="timerDisplay">00:00</span></div>
     </div>
 
     <div class="board" id="gameBoard"></div>
 
     <div class="message-area" id="messageBox"></div>
-    <button class="reset-btn" id="resetGame">🔄 لعبة جديدة</button>
-    <footer>⭐ إقلب بطاقتين، تطابق؟ يبقون مكشوفين! ⭐</footer>
+    <button class="reset-btn" id="resetGame">🔄 Nouvelle Partie</button>
+    <footer>⭐ Flip two cards, find the match! ⭐</footer>
 </div>
 
 <script>
+    // ------------------- ترجمة النصوص ------------------
+    const translations = {
+        fr: {
+            title: "🧠 Jeu de Mémoire 🃏",
+            sub: "✧ Retournez les cartes et trouvez les paires ✧",
+            moves: "Mouvements:",
+            pairs: "Paires:",
+            time: "Temps:",
+            reset: "🔄 Nouvelle Partie",
+            winMessage: (moves, time) => `🎉🎊 Félicitations ! Vous avez complété le jeu en ${moves} mouvement(s) et ${time} 🎊🎉`,
+            defaultMessage: "✨ Retournez deux cartes et trouvez la paire ! ✨",
+            pairFound: (current, total) => `✨ ${current} paires trouvées sur ${total} ✨`,
+            footer: "⭐ Retournez deux cartes, trouvez la paire ! ⭐"
+        },
+        en: {
+            title: "🧠 Memory Game 🃏",
+            sub: "✧ Flip the cards and find the matches ✧",
+            moves: "Moves:",
+            pairs: "Matches:",
+            time: "Time:",
+            reset: "🔄 New Game",
+            winMessage: (moves, time) => `🎉🎊 Congratulations! You completed the game in ${moves} moves and ${time} 🎊🎉`,
+            defaultMessage: "✨ Flip two cards and find the match! ✨",
+            pairFound: (current, total) => `✨ ${current} pairs found out of ${total} ✨`,
+            footer: "⭐ Flip two cards, find the match! ⭐"
+        }
+    };
+
+    let currentLang = 'fr'; // langue par défaut: français
+
+    // Mettre à jour l'interface texte
+    function updateUILanguage() {
+        const t = translations[currentLang];
+        document.getElementById('gameTitle').textContent = t.title;
+        document.getElementById('subText').textContent = t.sub;
+        document.getElementById('moveLabel').textContent = t.moves;
+        document.getElementById('matchLabel').textContent = t.pairs;
+        document.getElementById('timerLabel').textContent = t.time;
+        document.getElementById('resetGame').textContent = t.reset;
+        document.querySelector('footer').textContent = t.footer;
+        
+        // Mettre à jour le message si la partie est en cours ou terminée
+        if (matchedPairs === ICONS.length) {
+            messageBox.textContent = t.winMessage(moveCounter, formatTime(timerSeconds));
+        } else {
+            if (matchedPairs > 0) {
+                messageBox.textContent = t.pairFound(matchedPairs, ICONS.length);
+            } else {
+                messageBox.textContent = t.defaultMessage;
+            }
+        }
+        
+        // Mettre à jour les boutons de langue actifs
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if (btn.dataset.lang === currentLang) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
     // ------------------- إعدادات الرموز (8 أزواج => 16 بطاقة) ------------------
     const ICONS = [
-        "🐶", "🐱", "🐭", "🐹",   // حيوانات لطيفة
+        "🐶", "🐱", "🐭", "🐹",
         "🐰", "🦊", "🐻", "🐼"
     ];
     
-    // نسخ الأيقونات لتشكيل الأزواج ثم خلطها
-    let cardsData = [];        // يحفظ { icon: string, matched: bool, cardId: int }
-    let gameCards = [];        // عناصر DOM للبطاقات
+    let cardsData = [];
+    let gameCards = [];
     let boardElement = document.getElementById('gameBoard');
     
-    // متغيرات التحكم باللعبة
     let moveCounter = 0;
     let matchedPairs = 0;
     let timerSeconds = 0;
     let timerInterval = null;
-    let gameActive = true;          // إذا انتهت اللعبة نمنع التقليب
-    let lockBoard = false;          // قفل أثناء معالجة التقليب أو عند مقارنة بطاقتين
-    let firstCard = null;           // العنصر الأول المقلوب
-    let secondCard = null;          // العنصر الثاني المقلوب
+    let gameActive = true;
+    let lockBoard = false;
+    let firstCard = null;
+    let secondCard = null;
     let firstCardId = null;
     let secondCardId = null;
     
-    // عناصر واجهة
     const moveSpan = document.getElementById('moveCount');
     const matchSpan = document.getElementById('matchCount');
     const timerDisplaySpan = document.getElementById('timerDisplay');
     const messageBox = document.getElementById('messageBox');
     const resetBtn = document.getElementById('resetGame');
     
-    // دوال مساعدة لتنسيق الوقت
     function formatTime(sec) {
         let minutes = Math.floor(sec / 60);
         let seconds = sec % 60;
@@ -310,7 +413,6 @@
         timerDisplaySpan.textContent = formatTime(timerSeconds);
     }
     
-    // بدء المؤقت (فقط إذا لم يكن يعمل واللعبة لم تنتهِ بعد)
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -318,14 +420,12 @@
                 timerSeconds++;
                 updateTimerUI();
             } else if (matchedPairs === ICONS.length) {
-                // نوقف المؤقت عند النصر (لكن نظل نمنع الزيادة)
                 if (timerInterval) clearInterval(timerInterval);
                 timerInterval = null;
             }
         }, 1000);
     }
     
-    // إيقاف المؤقت بشكل كامل
     function stopTimer() {
         if (timerInterval) {
             clearInterval(timerInterval);
@@ -333,30 +433,25 @@
         }
     }
     
-    // تحديث عداد الحركات
     function incrementMove() {
         moveCounter++;
         moveSpan.textContent = moveCounter;
     }
     
-    // تحديث عداد الأزواج
     function updateMatches() {
         matchSpan.textContent = matchedPairs;
+        const t = translations[currentLang];
         if (matchedPairs === ICONS.length) {
-            // النصر!
             gameActive = false;
             stopTimer();
-            messageBox.textContent = `🎉🎊 تهانينا! لقد أكملت اللعبة في ${moveCounter} حركة و زمن ${formatTime(timerSeconds)} 🎊🎉`;
-            // إضافة تأثير إضافي: منع أي تقليب جديد
+            messageBox.textContent = t.winMessage(moveCounter, formatTime(timerSeconds));
             lockBoard = true;
         } else {
-            messageBox.textContent = `✨ تم العثور على ${matchedPairs} من أصل ${ICONS.length} أزواج ✨`;
+            messageBox.textContent = t.pairFound(matchedPairs, ICONS.length);
         }
     }
     
-    // دالة لإعادة ضبط البطاقات المقلوبة مؤقتاً (لا تؤثر على المتطابقة)
     function resetBoardState() {
-        // نحرر القفل و نمسح البطاقات المؤقتة
         firstCard = null;
         secondCard = null;
         firstCardId = null;
@@ -364,121 +459,68 @@
         lockBoard = false;
     }
     
-    // فحص التطابق بين بطاقتين
     function checkMatch(cardA, cardB, idA, idB) {
         const iconA = cardsData[idA].icon;
         const iconB = cardsData[idB].icon;
         
         if (iconA === iconB) {
-            // تطابق ناجح
             cardsData[idA].matched = true;
             cardsData[idB].matched = true;
             
-            // إضافة كلاس matched للبطاقتين في DOM
             const cardElementA = gameCards[idA];
             const cardElementB = gameCards[idB];
             cardElementA.classList.add('matched');
             cardElementB.classList.add('matched');
-            // التأكد من بقاء الوجه مقلوباً (لا يمكن قلبه مجدداً)
             cardElementA.classList.add('flipped');
             cardElementB.classList.add('flipped');
             
             matchedPairs++;
             updateMatches();
-            
-            // إعادة تعيين حالة البطاقات المؤقتة
             resetBoardState();
         } else {
-            // لا تطابق: بعد تأخير نقلب البطاقتين مرة أخرى للخلف
             setTimeout(() => {
-                // التأكد أن البطاقات لم تصبح matched في الأثناء (لن تصبح لأننا نتحقق)
                 if (cardsData[idA].matched === false && cardsData[idB].matched === false) {
-                    // إزالة class flipped
                     const cardElemA = gameCards[idA];
                     const cardElemB = gameCards[idB];
                     cardElemA.classList.remove('flipped');
                     cardElemB.classList.remove('flipped');
                 }
-                // بعد انتهاء التقليب نفتح القفل للسماح بتقليب جديد
                 resetBoardState();
-                // إعادة تمكين النقر بعد انتهاء التأخير (lockBoard تم تحريره بواسطة resetBoardState)
-                // ولكن قد يكون هناك أكثر من تأثير، نتأكد
-                if (!gameActive) lockBoard = true; // إذا انتهت اللعبة نظل مقفل
+                if (!gameActive) lockBoard = true;
                 else lockBoard = false;
             }, 800);
         }
     }
     
-    // معالجة النقر على البطاقة
     function onCardClick(cardIndex) {
-        // شروط المنع:
         if (lockBoard) return;
         if (!gameActive) return;
-        if (cardsData[cardIndex].matched) return;   // بطاقة متطابقة نهائياً
+        if (cardsData[cardIndex].matched) return;
         
         const currentCardElement = gameCards[cardIndex];
-        // إذا كانت البطاقة مقلوبة بالفعل ولم يتم التطابق (يعني أول/ثاني مكرر) نمنع
         if (currentCardElement.classList.contains('flipped')) return;
-        
-        // إذا كان هناك بطاقتان مقلوبتان في الانتظار ( firstCard و secondCard ليسوا null ) هذا لا يجب أن يحدث بسبب lockBoard ولكن احتياطي
         if (firstCard !== null && secondCard !== null) return;
         
-        // بدء المؤقت عند أول حركة حقيقية (أول تقليب)
         if (moveCounter === 0 && timerInterval === null && matchedPairs === 0) {
             startTimer();
         }
         
-        // نقوم بتقليب البطاقة الحالية
         currentCardElement.classList.add('flipped');
         
-        // تحديث الحركات في كل مرة يتم فيها تقليب بطاقة (لكن كل زوج من التقليبات يحتسب حركة واحدة، نستخدم منطق أول/ثاني)
-        // نستخدم متغير لتتبع أول مرة نضيف فيها الحركة عند اكتمال زوج
         if (firstCard === null) {
-            // أول بطاقة مقلوبة
             firstCard = currentCardElement;
             firstCardId = cardIndex;
         } else if (secondCard === null && firstCardId !== cardIndex) {
-            // البطاقة الثانية مختلفة عن الأولى
             secondCard = currentCardElement;
             secondCardId = cardIndex;
-            // الآن تم قلب بطاقتين، نزيد عدد الحركات
             incrementMove();
-            // نقفل اللوحة لمنع أي تقليب إضافي أثناء المقارنة
             lockBoard = true;
-            // نقوم بالتحقق من التطابق
             checkMatch(firstCard, secondCard, firstCardId, secondCardId);
-            // بعد استدعاء checkMatch، سيتم إعادة ضبط firstCard, secondCard داخل تلك الدالة أو بعد timeout
-            // لكن لضمان عدم وجود بقايا في المتغيرات محلياً، ننظف بعد استدعاء checkMatch
-            // مع العلم أن resetBoardState ستنظف داخل checkMatch لكن في حالة عدم التطابق بعد timeout.
-            // هنا نضع firstCard, secondCard كـ null بعد استدعاء checkMatch لأنها مسؤولة عن إعادة التعيين، ولكن قد تحتاج إلى حماية.
-            // للتأكد: بعد checkMatch سوف يتم استدعاء resetBoardState في النهاية. لكن لو حدث خطأ, سنقوم بتعيين مؤقت منفصل.
-            // دعنا نعتمد على أن firstCard,secondCard ستُفرغ داخل checkMatch. لكن في حالة التطابق الفوري يتم resetBoardState.
-            // في حالة عدم التطابق بعد 800 مللي ثانية سيتم resetBoardState. أضفنا أيضاً في نهاية checkMatch في فرع التطابق, وفي فرع عدم التطابق أيضاً.
-            // لكن هنا لو أبقينا firstCard و secondCard مع القيم سيسبب مشكلة. لذلك بعد استدعاء checkMatch, نضعهم في null بشكل فوري لتفادي إعادة النقر أثناء التأخير.
-            // لأنه عند إعادة النقر أثناء انتظار timeout قد يحدث عطب. لكن بفضل lockBoard لن يتم النقر. مع ذلك من الآمن إفراغهما.
-            // هذا آمن.
-            // نضبط firstCard, secondCard على null بشكل لحظي بعد التحقق, لأن checkMatch ستعيد ضبطهما بعد انتهاء المقارنة. 
-            // لكن في حالة التطابق تم resetBoardState, وفي حالة عدم التطابق سيتم بعد 800ms. لو وضعناهم null هنا لن يؤثر على التأخير.
-            // في الواقع resetBoardState تقوم بتعيين firstCard,secondCard = null, لذلك لا داعي للتداخل. لكن لضمان سلاسة أكثر:
-            // لا نريد إبقائهم بقيم قديمة بعد الاستدعاء. ولكن checkMatch ستقوم بإعادة تعيين بعد المقارنة (في الـ timeout أو فوراً). دعنا نضبطهم أيضاً هنا؟
-            // لكن لو تم ضبطهم null, وفي دالة checkMatch بعد 800ms يحاول استخدام firstCard (التي أصبحت null) لعمل إزالة كلاس flipped على null خطأ.
-            // لذلك من الضروري ألا نمسح firstCard,secondCard بأنفسنا بل نترك checkMatch تمسحهم بعد التأكد من اكتمال العملية.
-            // لذلك يجب أن نتركهم كما هم لاستخدامهم في checkMatch ضمن timeout.
-            // الحل الأمثل: checkMatch تستخدم المتغيرات العالمية firstCard,secondCard, وتقوم بتنظيفها بعد الاستخدام.
-            // سنعدل checkMatch لتنظيفها مباشرة قبل انتهاءها أو في timeout.
-            // ولكن لدينا بالفعل resetBoardState يفعل ذلك. لكن في حالة عدم التطابق سيتم التنظيف بعد الـ timeout.
-            // ممتاز.
-        } else {
-            // إذا حاول يقلب نفس البطاقة مرة أخرى أو أي حالة شاذة، نمنع.
-            return;
         }
     }
     
-    // بناء الشبكة وخلط الأيقونات
     function initGame() {
-        // إيقاف المؤقت القديم إن وجد
         stopTimer();
-        // إعادة ضبط المتغيرات
         moveCounter = 0;
         matchedPairs = 0;
         timerSeconds = 0;
@@ -492,31 +534,28 @@
         moveSpan.textContent = "0";
         matchSpan.textContent = "0";
         updateTimerUI();
-        messageBox.textContent = "✨ اقلب بطاقتين وابحث عن الزوج! ✨";
         
-        // تحضير الأزواج المزدوجة
+        const t = translations[currentLang];
+        messageBox.textContent = t.defaultMessage;
+        
         let deck = [...ICONS, ...ICONS];
-        // خلط عشوائي (خوارزمية Fisher-Yates)
         for (let i = deck.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [deck[i], deck[j]] = [deck[j], deck[i]];
         }
         
-        // بناء مصفوفة cardsData
         cardsData = deck.map((icon, idx) => ({
             icon: icon,
             matched: false,
             cardId: idx
         }));
         
-        // إعادة إنشاء لوحة اللعب
         boardElement.innerHTML = "";
         gameCards = [];
         
         deck.forEach((icon, idx) => {
             const card = document.createElement('div');
             card.className = 'card';
-            // إضافة حدث النقر
             card.addEventListener('click', (e) => {
                 e.stopPropagation();
                 onCardClick(idx);
@@ -541,27 +580,47 @@
         });
     }
     
-    // إعادة ضبط كاملة (زر جديد)
     function resetAndRestart() {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
         initGame();
-        // التأكد من أن اللعبة نشطة والمؤقت لم يبدأ بعد الحركات الأولى
         gameActive = true;
         lockBoard = false;
-        // مسح الرسائل الإضافية
-        messageBox.textContent = "✨ لعبة جديدة! ابدأ بتقليب البطاقات ✨";
+        const t = translations[currentLang];
+        messageBox.textContent = t.defaultMessage;
     }
     
-    // ربط زر الإعادة
+    // Changer la langue
+    function setLanguage(lang) {
+        if (lang === currentLang) return;
+        currentLang = lang;
+        updateUILanguage();
+        // Mettre à jour le message sans perdre l'état du jeu
+        const t = translations[currentLang];
+        if (matchedPairs === ICONS.length) {
+            messageBox.textContent = t.winMessage(moveCounter, formatTime(timerSeconds));
+        } else if (matchedPairs > 0) {
+            messageBox.textContent = t.pairFound(matchedPairs, ICONS.length);
+        } else {
+            messageBox.textContent = t.defaultMessage;
+        }
+    }
+    
+    // Événements pour les boutons de langue
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setLanguage(btn.dataset.lang);
+        });
+    });
+    
     resetBtn.addEventListener('click', () => {
         resetAndRestart();
     });
     
-    // بدء اللعبة أول مرة
     initGame();
+    updateUILanguage();
 </script>
 </body>
 </html>
