@@ -39,38 +39,6 @@
 
 ---
 
-## ✨ Fonctionnalités
-
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <img src="https://via.placeholder.com/100/ffd966/2c2b26?text=🎯" width="80">
-        <br><strong>Gameplay</strong>
-      </td>
-      <td align="center">
-        <img src="https://via.placeholder.com/100/ffd966/2c2b26?text=🌍" width="80">
-        <br><strong>Bilingue</strong>
-      </td>
-      <td align="center">
-        <img src="https://via.placeholder.com/100/ffd966/2c2b26?text=🎨" width="80">
-        <br><strong>Design</strong>
-      </td>
-      <td align="center">
-        <img src="https://via.placeholder.com/100/ffd966/2c2b26?text=⚡" width="80">
-        <br><strong>Performance</strong>
-      </td>
-    </tr>
-    <tr>
-      <td>8 paires • Chronomètre • Compteur</td>
-      <td>FR/EN • Changement instantané</td>
-      <td>Animations 3D • Responsive</td>
-      <td>Vanilla JS • 25KB</td>
-    </tr>
-  </table>
-</div>
-
----
 
 ## 📸 Aperçu du jeu
 
@@ -81,12 +49,7 @@
   <em>Interface principale du jeu avec les cartes retournées</em>
 </p>
 
-### Animation de retournement
-<p align="center">
-  <img src="https://via.placeholder.com/700x400/2c5f2d/ffffff?text=Card+Flip+Animation" alt="Card Flip Animation" width="700">
-  <br>
-  <em>Animation 3D lors du retournement des cartes</em>
-</p>
+
 
 ### Message de victoire
 <p align="center">
@@ -103,20 +66,11 @@
         <img src="https://via.placeholder.com/300x500/2c5f2d/ffffff?text=Mobile+View+1" width="250">
         <br><em>Vue smartphone</em>
       </td>
-      <td align="center">
-        <img src="https://via.placeholder.com/300x500/2c5f2d/ffffff?text=Mobile+View+2" width="250">
-        <br><em>Tablette</em>
-      </td>
     </tr>
   </table>
 </div>
 
-### Changement de langue
-<p align="center">
-  <img src="https://via.placeholder.com/700x300/2c5f2d/ffffff?text=Language+Switch" alt="Language Switch" width="700">
-  <br>
-  <em>Bascule instantanée Français ↔ English</em>
-</p>
+
 
 ---
 
