@@ -1,6 +1,5 @@
-# 🧠 Memory Game - Jeu de Mémoire
+    # 🧠 Memory Game - Jeu de Mémoire
 
-![Memory Game Banner](https://via.placeholder.com/1200x300/2c5f2d/ffffff?text=Memory+Game+-+Jeu+de+M%C3%A9moire)
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/votre-username/memory-game)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://html.spec.whatwg.org/)
@@ -9,9 +8,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-<p align="center">
-  <img src="https://via.placeholder.com/800x400/2c5f2d/ffffff?text=Memory+Game+Screenshot" alt="Game Screenshot" width="800">
-</p>
+
 
 ## 📑 Table des matières
 - [🎮 Demo](#-demo)
@@ -29,13 +26,6 @@
 
 ---
 
-## 🎮 Demo
-
-<div align="center">
-  <img src="https://via.placeholder.com/600x400/1a472a/ffffff?text=Click+to+Play" alt="Demo GIF" width="600">
-  <br>
-  <strong>👉 <a href="#">Jouer en ligne</a> 👈</strong>
-</div>
 
 ---
 
@@ -55,7 +45,7 @@
   <table>
     <tr>
       <td align="center">
-        <img src="https://via.placeholder.com/300x500/2c5f2d/ffffff?text=Mobile+View+1" width="250">
+        <img src="MOBILE.PNG" width="250">
         <br><em>Vue smartphone</em>
       </td>
     </tr>
