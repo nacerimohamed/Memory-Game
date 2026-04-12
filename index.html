@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Memory Game - Jeu de Mémoire</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="game-container">
+    <div class="header">
+        <h1 id="gameTitle">🧠 Jeu de Mémoire 🃏</h1>
+        <div class="lang-switch">
+            <button class="lang-btn" data-lang="fr">🇫🇷 FR</button>
+            <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+        </div>
+    </div>
+    <div class="sub" id="subText">✧ Retournez les cartes et trouvez les paires ✧</div>
+
+    <div class="stats-panel">
+        <div class="moves">🚀 <span id="moveLabel">Mouvements:</span> <span id="moveCount">0</span></div>
+        <div class="matches">🏆 <span id="matchLabel">Paires:</span> <span id="matchCount">0</span></div>
+        <div class="timer">⏱️ <span id="timerLabel">Temps:</span> <span id="timerDisplay">00:00</span></div>
+    </div>
+
+    <div class="board" id="gameBoard"></div>
+
+    <div class="message-area" id="messageBox"></div>
+    <button class="reset-btn" id="resetGame">🔄 Nouvelle Partie</button>
+    <footer>⭐ Flip two cards, find the match! ⭐</footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
