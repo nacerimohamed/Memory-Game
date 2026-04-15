@@ -1,4 +1,4 @@
-    # 🧠 Memory Game - Jeu de Mémoire
+                                     # 🧠 Memory Game - Jeu de Mémoire
 
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/votre-username/memory-game)
@@ -66,7 +66,4 @@ git clone https://github.com/votre-username/memory-game.git
 # 2. Accédez au dossier
 cd memory-game
 
-# 3. Ouvrez avec un serveur local (optionnel)
-python -m http.server 8000
 
-# 4. Ouvrez votre navigateur sur http://localhost:8000
